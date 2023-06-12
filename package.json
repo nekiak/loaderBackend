@@ -1,0 +1,44 @@
+{
+  "name": "ghostmacro-bot",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "@sapphire",
+  "license": "UNLICENSE",
+  "type": "commonjs",
+  "dependencies": {
+    "@sapphire/discord-utilities": "^3.0.3",
+    "@sapphire/discord.js-utilities": "6.0.7",
+    "@sapphire/fetch": "^2.4.1",
+    "@sapphire/framework": "^4.4.3",
+    "@sapphire/plugin-api": "^5.0.3",
+    "@sapphire/plugin-editable-commands": "^3.0.2",
+    "@sapphire/plugin-logger": "^3.0.3",
+    "@sapphire/plugin-subcommands": "^4.0.1",
+    "@sapphire/time-utilities": "^1.7.9",
+    "@sapphire/type": "^2.4.0",
+    "@sapphire/utilities": "^3.11.1",
+    "@sellix/node-sdk": "^1.0.9",
+    "adm-zip": "^0.5.10",
+    "axios": "^1.4.0",
+    "colorette": "^2.0.20",
+    "discord.js": "^14.10.2",
+    "express": "^4.18.2",
+    "sequelize": "^6.32.0",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@sapphire/cli": "^1.6.1",
+    "@sapphire/prettier-config": "^1.4.5",
+    "nodemon": "^2.0.22",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.8"
+  },
+  "scripts": {
+    "sapphire": "sapphire",
+    "generate": "sapphire generate",
+    "watch": "nodemon -L --watch src",
+    "start": "node src/index.js",
+    "format": "prettier --write \"src/**/*.js\""
+  },
+  "prettier": "@sapphire/prettier-config"
+}
