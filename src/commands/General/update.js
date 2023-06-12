@@ -13,21 +13,13 @@ class UpdateCommand extends Subcommand {
 
 
     async messageRun(message, args) {
-        exec('git pull', (error, stdout, stderr) => {
+        exec('bash ~/loaderBackend/restart.sh', (error, stdout, stderr) => {
             if (error) {
-                message.reply(`Git pull error: ${error}`);
+                console.error(`Deployment error: ${error}`);
                 return;
             }
 
-            // Restart Node.js app using PM2
-            exec('pm2 restart all', (error, stdout, stderr) => {
-                if (error) {
-                    message.reply(`App restart error: ${error}`);
-                    return;
-                }
-
-                message.reply('Git pull and app restart completed successfully.');
-            });
+            console.log('Git pull and app restart completed successfully.');
         });
     }
 
