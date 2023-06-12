@@ -6,7 +6,7 @@ const https = require("https");
 
 const activeConnections = {};
 // lets assume that your priv key is private.key, your cert is certificate.pem and your chain is fullchain.pem
-const cert_dir = "../../certs/"
+const cert_dir = "../../cert/myLoaderServer/"
 const shouldUseSSL = true;
 const port = 65212
 
@@ -78,17 +78,18 @@ async function handleWebSocketConnection(ws, req) {
 
 
 async function start() {
-	const privateKey = fs.readFileSync(cert_dir + "private.key");
-	const certificate = fs.readFileSync(cert_dir + "certificate.pem");
-	const fullchain = fs.readFileSync(cert_dir + "fullchain.pem");
+
 	let server;
 	if (shouldUseSSL) {
+		const privateKey = fs.readFileSync(path.join(cert_dir + "private.key"));
+		const certificate = fs.readFileSync(path.join(cert_dir + "certificate.pem"));
+		const fullchain = fs.readFileSync(path.join(cert_dir + "fullchain.pem"));
 		let httpsServer = https.createServer({
 			key: privateKey,
 			cert: certificate,
 			ca: fullchain,
 		});
-		server = new WebSocket.Server({ httpsServer, path: "/ghostloader" });
+		server = new WebSocket.Server({ server:httpsServer, path: "/ghostloader" });
 		httpsServer.listen(port, () => {
 			console.log(`WebSocket server is running on port ${port} (HTTPS)`);
 		});
