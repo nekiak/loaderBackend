@@ -78,7 +78,7 @@ async function handleWebSocketConnection(ws, req) {
 
 
 async function start() {
-
+	console.log("Starting")
 	let server;
 	if (shouldUseSSL) {
 		const privateKey = fs.readFileSync(path.join(cert_dir + "private.key"));
