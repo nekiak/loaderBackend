@@ -2,8 +2,13 @@ const { sequelize, Device } = require('../database/database');
 const fs = require("fs");
 const WebSocket = require("ws");
 const path = require('path');
+const https = require("https");
 
 const activeConnections = {};
+// lets assume that your priv key is private.key, your cert is certificate.pem and your chain is fullchain.pem
+const cert_dir = "../../certs/"
+const shouldUseSSL = true;
+const port = 65212
 
 async function handleWebSocketConnection(ws, req) {
 	const headers = req.headers;
@@ -73,8 +78,25 @@ async function handleWebSocketConnection(ws, req) {
 
 
 async function start() {
+	const privateKey = fs.readFileSync(cert_dir + "private.key");
+	const certificate = fs.readFileSync(cert_dir + "certificate.pem");
+	const fullchain = fs.readFileSync(cert_dir + "fullchain.pem");
+	let server;
+	if (shouldUseSSL) {
+		let httpsServer = https.createServer({
+			key: privateKey,
+			cert: certificate,
+			ca: fullchain,
+		});
+		server = new WebSocket.Server({ httpsServer, path: "/ghostloader" });
+		httpsServer.listen(port, () => {
+			console.log(`WebSocket server is running on port ${port} (HTTPS)`);
+		});
 
-	const server = new WebSocket.Server({ port: 65212, path: "/ghostloader" });
+	} else {
+		server = new WebSocket.Server({ port: port, path: "/ghostloader" });
+	}
+
 	server.on('connection', (socket, req) => {
 		console.log(req.headers.key + " just connected")
 		handleWebSocketConnection(socket, req);
