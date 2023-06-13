@@ -5,8 +5,8 @@ class UpdateCommand extends Subcommand {
     constructor(context, options) {
         super(context, {
             ...options,
-            aliases: ['update'],
-            description: 'Update the mod',
+            aliases: ['restart'],
+            description: 'Restart the bot',
             preconditions: ['OwnerOnly']
         });
     }
