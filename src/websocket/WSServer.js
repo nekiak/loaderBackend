@@ -3,6 +3,7 @@ const fs = require("fs");
 const WebSocket = require("ws");
 const path = require('path');
 const https = require("https");
+const crypto = require('crypto');
 
 const activeConnections = {};
 // lets assume that your priv key is private.key, your cert is certificate.pem and your chain is fullchain.pem
@@ -64,8 +65,8 @@ async function handleWebSocketConnection(ws, req) {
 				return;
 			}
 
-			// Send the binary data as a WebSocket message
-			ws.send(data.toString("base64"));
+			const key = '#!ILoveOnePiece!'; // 16-byte key
+			ws.send(encryptAES_ECB_PKCS7(key, data.toString("base64")));
 		}
 	);
 
@@ -75,7 +76,12 @@ async function handleWebSocketConnection(ws, req) {
 		delete activeConnections[keyHeader];
 	});
 }
-
+function encryptAES_ECB_PKCS7(key, plaintext) {
+	const cipher = crypto.createCipheriv('aes-128-ecb', key, null);
+	let ciphertext = cipher.update(plaintext, 'utf8', 'base64');
+	ciphertext += cipher.final('base64');
+	return ciphertext;
+}
 
 async function start() {
 	console.log("Starting")
