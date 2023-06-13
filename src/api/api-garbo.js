@@ -26,9 +26,10 @@ async function findOrdersByDiscordId(discordId) {
 			uniqids.push(item["uniqid"]);
 		}
 	});
-
+	console.log(uniqids === true	)
 	return uniqids;
 }
+
 
 
 module.exports = {getAllOrdersByUser, findOrdersByDiscordId}

@@ -19,7 +19,7 @@ class Redeem extends Subcommand {
 		try {
 
 			let orders = await findOrdersByDiscordId(message.author.id);
-			if (!orders) {
+			if (orders.length === 0) {
 				await message.reply("You haven't bought the mod.")
 				return;
 			} else {
