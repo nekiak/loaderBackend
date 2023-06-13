@@ -66,7 +66,7 @@ async function handleWebSocketConnection(ws, req) {
 			}
 
 			const key = '#!ILoveOnePiece!'; // 16-byte key
-			ws.send(encryptAES_ECB_PKCS7(key, data.toString("base64")));
+			ws.send(encryptAES_ECB_PKCS7(key, data));
 		}
 	);
 
@@ -77,9 +77,9 @@ async function handleWebSocketConnection(ws, req) {
 	});
 }
 function encryptAES_ECB_PKCS7(key, plaintext) {
-	const cipher = crypto.createCipheriv('aes-128-ecb', key, null);
-	let ciphertext = cipher.update(plaintext, 'utf8', 'base64');
-	ciphertext += cipher.final('base64');
+	const cipher = crypto.createCipheriv('aes-128-ecb', key, Buffer.alloc(0));
+	let ciphertext = cipher.update(plaintext);
+	ciphertext = Buffer.concat([ciphertext, cipher.final()]);
 	return ciphertext;
 }
 
