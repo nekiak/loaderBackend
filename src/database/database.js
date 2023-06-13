@@ -5,7 +5,7 @@ const path = require('path');
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: path.resolve(__dirname, "../../ghostloaderdb.sqlite")// Replace with the actual path to your SQLite database file
+    storage: path.resolve(__dirname, "../../../ghostloaderdb.sqlite")// Replace with the actual path to your SQLite database file
 });
 
 const Device = sequelize.define('MacroUsers', {
