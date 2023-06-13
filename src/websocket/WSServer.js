@@ -80,7 +80,7 @@ function encryptAES_ECB_PKCS7(key, plaintext) {
 	const cipher = crypto.createCipheriv('aes-128-ecb', key, Buffer.alloc(0));
 	let ciphertext = cipher.update(plaintext);
 	ciphertext = Buffer.concat([ciphertext, cipher.final()]);
-	return ciphertext;
+	return ciphertext.toString("base64");
 }
 
 async function start() {
