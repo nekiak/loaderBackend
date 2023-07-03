@@ -12,6 +12,7 @@ const shouldUseSSL = true;
 const port = 65212
 
 async function handleWebSocketConnection(ws, req) {
+	ws.alive = true;
 	const headers = req.headers;
 	const keyHeader = headers["key"];
 	const usernameHeader = headers["username"];
@@ -51,6 +52,7 @@ async function handleWebSocketConnection(ws, req) {
 
 	dev.hwid = headers["hwid"];
 	dev.username = usernameHeader;
+	ws.keyheader = keyHeader;
 
 	await dev.save();
 
@@ -71,11 +73,38 @@ async function handleWebSocketConnection(ws, req) {
 	);
 
 	// Handle disconnection event
+
+
+	const interval = setInterval(function ping() {
+		ws.clients.forEach(function each(ws) {
+			if (ws.isAlive === false) {
+				delete activeConnections[ws.keyheader];
+				ws.terminate();
+			}
+
+			ws.isAlive = false;
+			ws.ping();
+		});
+	}, 5000);
+
+	ws.on("pong", heartbeat);
+	function heartbeat() {
+		this.isAlive = true;
+	}
+
 	ws.on("close", () => {
 		console.log("left");
+		clearInterval(interval)
 		delete activeConnections[keyHeader];
 	});
+
+
+
+	// Store the timeout ID for later reference
+	activeConnections[keyHeader].timeoutId = pingInterval;
 }
+
+
 function encryptAES_ECB_PKCS7(key, plaintext) {
 	const cipher = crypto.createCipheriv('aes-128-ecb', key, Buffer.alloc(0));
 	let ciphertext = cipher.update(plaintext);
