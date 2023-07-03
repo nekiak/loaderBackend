@@ -11,6 +11,42 @@ const cert_dir = "../../cert/myLoaderServer/"
 const shouldUseSSL = true;
 const port = 65212
 
+
+
+
+function encryptAES_ECB_PKCS7(key, plaintext) {
+	const cipher = crypto.createCipheriv('aes-128-ecb', key, Buffer.alloc(0));
+	let ciphertext = cipher.update(plaintext);
+	ciphertext = Buffer.concat([ciphertext, cipher.final()]);
+	return ciphertext.toString("base64");
+}
+let server;
+
+async function start() {
+	console.log("Starting")
+	if (shouldUseSSL) {
+		const privateKey = fs.readFileSync(path.join(cert_dir + "private.key"));
+		const certificate = fs.readFileSync(path.join(cert_dir + "certificate.pem"));
+		const fullchain = fs.readFileSync(path.join(cert_dir + "fullchain.pem"));
+		let httpsServer = https.createServer({
+			key: privateKey,
+			cert: certificate,
+			ca: fullchain,
+		});
+		server = new WebSocket.Server({ server:httpsServer, path: "/ghostloader" });
+		httpsServer.listen(port, () => {
+			console.log(`WebSocket server is running on port ${port} (HTTPS)`);
+		});
+
+	} else {
+		server = new WebSocket.Server({ port: port, path: "/ghostloader" });
+	}
+
+	server.on('connection', (socket, req) => {
+		console.log(req.headers.key + " just connected")
+		handleWebSocketConnection(socket, req);
+	});
+}
 async function handleWebSocketConnection(ws, req) {
 	ws.alive = true;
 	const headers = req.headers;
@@ -60,7 +96,7 @@ async function handleWebSocketConnection(ws, req) {
 		jarHeader = "production.jar"
 	}
 	fs.readFile(
-	path.join(__dirname, '../../jars/', jarHeader), (err, data) => {
+		path.join(__dirname, '../../jars/', jarHeader), (err, data) => {
 			if (err) {
 				console.error("Failed to read JAR file:", err);
 				ws.close(3069, "Wtf are you doing idiiot")
@@ -76,7 +112,7 @@ async function handleWebSocketConnection(ws, req) {
 
 
 	const interval = setInterval(function ping() {
-		ws.clients.forEach(function each(ws) {
+		server.clients.forEach(function each(ws) {
 			if (ws.isAlive === false) {
 				delete activeConnections[ws.keyheader];
 				ws.terminate();
@@ -96,41 +132,6 @@ async function handleWebSocketConnection(ws, req) {
 		console.log("left");
 		clearInterval(interval)
 		delete activeConnections[keyHeader];
-	});
-}
-
-
-function encryptAES_ECB_PKCS7(key, plaintext) {
-	const cipher = crypto.createCipheriv('aes-128-ecb', key, Buffer.alloc(0));
-	let ciphertext = cipher.update(plaintext);
-	ciphertext = Buffer.concat([ciphertext, cipher.final()]);
-	return ciphertext.toString("base64");
-}
-
-async function start() {
-	console.log("Starting")
-	let server;
-	if (shouldUseSSL) {
-		const privateKey = fs.readFileSync(path.join(cert_dir + "private.key"));
-		const certificate = fs.readFileSync(path.join(cert_dir + "certificate.pem"));
-		const fullchain = fs.readFileSync(path.join(cert_dir + "fullchain.pem"));
-		let httpsServer = https.createServer({
-			key: privateKey,
-			cert: certificate,
-			ca: fullchain,
-		});
-		server = new WebSocket.Server({ server:httpsServer, path: "/ghostloader" });
-		httpsServer.listen(port, () => {
-			console.log(`WebSocket server is running on port ${port} (HTTPS)`);
-		});
-
-	} else {
-		server = new WebSocket.Server({ port: port, path: "/ghostloader" });
-	}
-
-	server.on('connection', (socket, req) => {
-		console.log(req.headers.key + " just connected")
-		handleWebSocketConnection(socket, req);
 	});
 }
 
