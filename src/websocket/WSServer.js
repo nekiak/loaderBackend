@@ -97,11 +97,6 @@ async function handleWebSocketConnection(ws, req) {
 		clearInterval(interval)
 		delete activeConnections[keyHeader];
 	});
-
-
-
-	// Store the timeout ID for later reference
-	activeConnections[keyHeader].timeoutId = pingInterval;
 }
 
 
